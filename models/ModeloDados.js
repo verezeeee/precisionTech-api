@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const DadosSchema = new mongoose.Schema({
     nome: {
@@ -10,6 +10,7 @@ const DadosSchema = new mongoose.Schema({
         required: true,
     },
     image: {
+        //Imagem convertida em base64 para ser salva no banco de dados
         type: String,
         required: true
     },
@@ -23,5 +24,4 @@ const DadosSchema = new mongoose.Schema({
     }
 })
 
-const Dados = mongoose.model('Dados', DadosSchema);
-module.exports = Dados;
+export default mongoose.models.posts || mongoose.model('Dados', DadosSchema);

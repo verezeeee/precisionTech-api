@@ -1,37 +1,83 @@
-require('dotenv').config()
-const cors = require('cors')
-const express = require('express')
-const app = express()
-const port = 3000
-const user = process.env.MONGO_USER
-const password = process.env.MONGO_PASS
-const db = process.env.MONGO_DBNAME
-const mongoose = require('mongoose')
-const uri = `mongodb+srv://${user}:${password}@${db}.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp`
-const Dados = require('./models/ModeloDados')
+import express from 'express';
+import connect from './database/connect.js';
+import Dados from './models/ModeloDados.js';
+import cors from 'cors';
 
-app.use(cors())
-app.use(express.json())
+const app = express();
+app.use(express.static('public'));
+app.use(express.json());
+app.use(cors());
 
-mongoose
-    .connect(uri)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log(err))
+const port = process.env.PORT || 3000;
 
+//Pegar os dados do DB e exibir no navegador - Rota principal
 app.get('/', (req, res) => {
-    res.send('API precisionTech')
-})
+  try {
+    Dados.find({}).then(data => {
+      res.json(data);
+    }).catch(error => {
+      res.json({ message: error });
+    })
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
 
-app.post('/dados', async (req, res) => {
-    try {
-        const dados = await Dados.create(req.body)
-        res.status(200).json(dados)
-    } catch (error) {
-        res.status(500).json({error: error.message})
-        console.log(err)
-    }
-})
+//Postar os dados no DB
+app.post('/uploadData', (req, res) => {
+  try {
+    const data = new Dados({
+      nome: req.body.nome,
+      service: req.body.service,
+      image: req.body.image,
+      data: req.body.data,
+      text: req.body.text
+    });
+    data.save().then(data => {
+      res.json(data);
+    }).catch(error => {
+      res.json({ message: error });
+    });
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
 
-app.listen(port, () => {
-    console.log(`API running on port ${port}`)
-})
+//Fazer o update de dados
+app.patch('/updateData/:id', (req, res) => {
+  try {
+    Dados.updateOne({ _id: req.params.id }, { $set: { nome: req.body.nome, service: req.body.service, image: req.body.image, data: req.body.data, text: req.body.text } }).then(data => {
+      res.json(data);
+    }).catch(error => {
+      res.json({ message: error });
+    });
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+//Deletar dados
+app.delete('/deleteData/:id', (req, res) => {
+  try {
+    Dados.deleteOne({ _id: req.params.id }).then(data => {
+      res.json(data);
+    }).catch(error => {
+      res.json({ message: error });
+    });
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+//Conectar ao banco de dados
+connect().then(() => {
+  try {
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  } catch (error) {
+    console.log("Can't connect to server")
+  }
+}).catch((error) => {
+  console.log("Invalid Database Connection...!");
+});
