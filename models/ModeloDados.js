@@ -9,11 +9,6 @@ const DadosSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: {
-        //Imagem convertida em base64 para ser salva no banco de dados
-        type: String,
-        required: true
-    },
     data: {
         type: String,
         required: true
