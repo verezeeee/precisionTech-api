@@ -6,4 +6,4 @@
 <pre>
 npm install <br><br> npm run dev <br><br> # or <br><br> yarn dev <br><br> # or <br><br> pnpm run dev
 </pre>
-<p>Open <a href='http://localhost:3000'>http://localhost:3000</a> on insomnia or any other app to make http requests to test the api</p>
+<p>Open <a href='http://localhost:3000'>http://localhost:3000</a> on insomnia or any other app to make http requests based on the endpoints to test the api</p>
